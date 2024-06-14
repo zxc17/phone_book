@@ -14,6 +14,7 @@
     Дополнить справочник возможностью копирования данных из одного файла в другой.
     Пользователь вводит номер строки, которую необходимо перенести из одного файла в другой.
 """
+import os
 
 # Глобальные переменные
 path = "phone_book.txt"  # Путь к файлу с телефонным справочником.
@@ -162,6 +163,28 @@ def delete():
 
 def copy_from_file():
     """Копирует отдельную запись из одного файла в другой."""
+    source_file = input('Введите имя файла для чтения: ')
+    if not os.path.isfile(source_file):
+        print('Ошибка. Файл не существует.')
+        return
+    target_file = input('Введите имя файла для записи: ')
+    num_record = input('Введите номер записи для копирования: ')
+    try:
+        num_record = int(num_record)
+        if num_record <= 0:
+            print('Ошибка. Необходимо положительное число.')
+            return
+    except ValueError:
+        print('Ошибка. Это не число')
+        return
+    correct_data = load_from_file(source_file)
+    num_record -= 1  # Номера записей, или строки в файле нумеруются с 1, индексация списков с 0.
+    if num_record > len(correct_data):
+        print('Ошибка. Записи с таким номером в исходном файле не существует.')
+        return
+    rec = correct_data[num_record]
+    with open(target_file, 'a', encoding="utf-8") as tf:
+        tf.write(';'.join(rec) + '\n')
 
 
 def exit_program():
@@ -211,7 +234,7 @@ def menu():
             '9': copy_from_file,
             '0': exit_program
         }
-        switch.get(input(), err)()  # Выбираем метод из словаря и запускаем его.
+        switch.get(input('>'), err)()  # Выбираем метод из словаря и запускаем его.
 
 
 # Запуск программы
