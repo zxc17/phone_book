@@ -23,23 +23,33 @@ saved = True  # Флаг, показывающий, что данные сохр
 # Формат хранения данных в файле - csv, разделитель ";". Три поля: "ФИО", "телефон", "примечания".
 
 
-def load():
-    """Загружает данные из файла"""
+def load_from_file(filename):
+    """
+    Считывает данные из указанного файла.
+    :param filename: Путь к файлу с данными.
+    :return: Список с корректными записями, считанные из файла.
+    """
     with open(path, 'r', encoding="utf-8") as data_file:
         read_data = [line.rstrip().split(';') for line in data_file]
-        # Если в записи не три поля - считаем ее некорректной и игнорируем.
-        # filter не использован для информирования пользователя о пропущенных строках.
-        n = 1
-        temp_data = []
-        for rec in read_data:
-            if len(rec) == 3:
-                temp_data.append(rec)
-            else:
-                print(f'Строка № {n} имеет некорректный формат, пропущена.')
-            n += 1
-    count = [i + 1 for i in range(len(temp_data))]
+    # Если в записи не три поля - считаем ее некорректной и игнорируем.
+    # filter не использован для информирования пользователя о пропущенных строках.
+    n = 1
+    correct_data = []
+    for rec in read_data:
+        if len(rec) == 3:
+            correct_data.append(rec)
+        else:
+            print(f'Строка № {n} имеет некорректный формат, пропущена.')
+        n += 1
+    return correct_data
+
+
+def load():
+    """Загружает данные из файла, сохраняет в памяти"""
+    correct_data = load_from_file(path)
+    count = [i + 1 for i in range(len(correct_data))]
     global data
-    data = dict(zip(count, temp_data))
+    data = dict(zip(count, correct_data))
     print('Данные загружены.')
     global saved
     saved = True
@@ -150,6 +160,10 @@ def delete():
     saved = False
 
 
+def copy_from_file():
+    """Копирует отдельную запись из одного файла в другой."""
+
+
 def exit_program():
     if saved:
         print('Выход')
@@ -183,6 +197,7 @@ def menu():
         print('   6: Добавить')
         print('   7: Изменить')
         print('   8: Удалить')
+        print('   9: Копировать запись из одного файла в другой')
         print('   0: Выход')
         switch = {
             '1': load,
@@ -193,6 +208,7 @@ def menu():
             '6': add,
             '7': change,
             '8': delete,
+            '9': copy_from_file,
             '0': exit_program
         }
         switch.get(input(), err)()  # Выбираем метод из словаря и запускаем его.
